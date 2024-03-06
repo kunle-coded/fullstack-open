@@ -1,7 +1,8 @@
-function Person({ person }) {
+function Person({ person, onDelete }) {
   return (
     <p>
-      {person.name} {person.number}
+      {person.name} {person.number}{" "}
+      <button onClick={() => onDelete(person)}>delete</button>
     </p>
   );
 }
