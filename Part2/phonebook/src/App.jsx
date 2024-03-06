@@ -6,6 +6,7 @@ import Filter from "./components/Filter";
 import Form from "./components/Form";
 import Persons from "./components/Persons";
 import personService from "./services/persons";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -14,6 +15,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [isDelete, setIsDelete] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [notificationClass, setNotificationClass] = useState("");
 
   function handleName(event) {
     setNewName(event.target.value);
@@ -44,7 +47,18 @@ const App = () => {
         const updatePers = { ...alreadyExist, number: newPerson.number };
         personService
           .update(alreadyExist.id, updatePers)
-          .then((res) => console.log(res));
+          .then((res) => {
+            setMessage(`Changed ${newPerson.name}'s number`);
+            setNotificationClass("success");
+          })
+          .catch((error) => {
+            if (error.response?.request?.status === 404) {
+              setMessage(
+                `Information of ${newPerson.name} has already been removed from server`
+              );
+              setNotificationClass("error");
+            }
+          });
       }
       setNewName("");
       setNewNumber("");
@@ -57,7 +71,14 @@ const App = () => {
 
       setNewName("");
       setNewNumber("");
+
+      setMessage(`Added ${newPerson.name}`);
+      setNotificationClass("success");
     }
+
+    setTimeout(() => {
+      setMessage(null);
+    }, 3000);
   }
 
   function onSearch(event) {
@@ -91,6 +112,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} className={notificationClass} />
       <Filter search={search} onSearch={onSearch} />
       <Form
         newName={newName}
