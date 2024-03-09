@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import axios from "axios";
 
-const baseUrl = "http://localhost:3001/persons";
+const baseUrl = "/api/persons";
 
 function getAll() {
   const request = axios.get(baseUrl);
@@ -10,7 +10,7 @@ function getAll() {
 
 function create(newObject) {
   const request = axios.post(baseUrl, newObject);
-  return request.then((res) => res.data);
+  return request.then((res) => res);
 }
 
 function deletePerson(id) {

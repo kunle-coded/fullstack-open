@@ -15,6 +15,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
   const [isDelete, setIsDelete] = useState(false);
+  const [isAdd, setIsAdd] = useState(false);
   const [message, setMessage] = useState(null);
   const [notificationClass, setNotificationClass] = useState("");
 
@@ -33,48 +34,40 @@ const App = () => {
       number: newNumber,
     };
 
-    const alreadyExist = persons.find(
-      (person) =>
-        person.name.toLocaleLowerCase() === newName.toLocaleLowerCase()
-    );
+    personService
+      .create(newPerson)
+      .then((res) => {
+        if (res.data.message === "Person already exists in phonebook") {
+          const id = res.data.person.id;
+          setIsAdd(false);
+          if (
+            window.confirm(
+              `${newName} is already added to phonebook, replace the old number with a new one?`
+            )
+          ) {
+            personService.update(id, newPerson).then((res) => {
+              setPersons(persons.concat(res));
+              setMessage(`Changed ${newPerson.name}'s number`);
+              setNotificationClass("success");
+              setNewName("");
+              setNewNumber("");
+            });
+          }
+        } else {
+          setPersons(persons.concat(res));
+          setMessage(`Added ${newPerson.name}`);
+          setNotificationClass("success");
+          setNewName("");
+          setNewNumber("");
+        }
+      })
+      .catch((error) => {
+        setIsAdd(false);
+        setMessage(error.response.data.error);
+        setNotificationClass("error");
+      });
 
-    if (alreadyExist) {
-      if (
-        window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`
-        )
-      ) {
-        const updatePers = { ...alreadyExist, number: newPerson.number };
-        personService
-          .update(alreadyExist.id, updatePers)
-          .then((res) => {
-            setMessage(`Changed ${newPerson.name}'s number`);
-            setNotificationClass("success");
-          })
-          .catch((error) => {
-            if (error.response?.request?.status === 404) {
-              setMessage(
-                `Information of ${newPerson.name} has already been removed from server`
-              );
-              setNotificationClass("error");
-            }
-          });
-      }
-      setNewName("");
-      setNewNumber("");
-    } else {
-      setPersons(persons.concat(newPerson));
-
-      personService
-        .create(newPerson)
-        .then((res) => setPersons(persons.concat(res)));
-
-      setNewName("");
-      setNewNumber("");
-
-      setMessage(`Added ${newPerson.name}`);
-      setNotificationClass("success");
-    }
+    setIsAdd(true);
 
     setTimeout(() => {
       setMessage(null);
@@ -88,10 +81,8 @@ const App = () => {
   function handleDelete(person) {
     if (window.confirm(`Delete ${person.name}`)) {
       personService.deletePerson(person.id).then((res) => setIsDelete(true));
-    } else {
-      setIsDelete(false);
-      return;
     }
+    setIsDelete(false);
   }
 
   useEffect(() => {
@@ -99,9 +90,13 @@ const App = () => {
   }, [isDelete]);
 
   useEffect(() => {
-    const filtered = persons.filter((person) =>
-      person.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-    );
+    personService.getAll().then((res) => setPersons(res));
+  }, [isAdd]);
+
+  useEffect(() => {
+    const filtered = persons.filter((person) => {
+      person?.name?.toLocaleLowerCase().includes(search.toLocaleLowerCase());
+    });
     setFilteredPersons([...filtered]);
 
     if (search === "") {
