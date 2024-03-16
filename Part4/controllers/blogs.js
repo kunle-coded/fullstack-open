@@ -55,8 +55,16 @@ blogsRouter.delete(
   }
 );
 
-blogsRouter.put("/:id", async (request, response) => {
-  const blog = await Blog.findByIdAndUpdate(request.params.id, request.body, {
+blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
+  const user = request.user;
+
+  const newBlog = {
+    ...request.body,
+    likes: request.body.isLike ? request.body.likes + 1 : request.body.likes,
+    user: user.id,
+  };
+
+  const blog = await Blog.findByIdAndUpdate(request.params.id, newBlog, {
     new: true,
   });
 
