@@ -1,0 +1,42 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  padding: 10px;
+}
+
+input {
+  margin: 5px 0px 5px 5px;
+}
+
+button {
+  margin: 5px 0px;
+  cursor: pointer;
+}
+
+/* a,
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none;
+  color: inherit;
+} */
+
+.hide {
+  display: none;
+}
+
+.blog {
+  padding-top: 10px;
+  padding-left: 5px;
+  border: solid;
+  border-width: 1px;
+  margin-bottom: 5px;
+}
+
+.blog span {
+  color: red;
+  transition: all 550ms;
+}

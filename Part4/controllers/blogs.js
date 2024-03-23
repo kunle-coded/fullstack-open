@@ -71,4 +71,26 @@ blogsRouter.put("/:id", middleware.userExtractor, async (request, response) => {
   response.status(201).json(blog);
 });
 
+blogsRouter.put(
+  "/:id/comments",
+  middleware.userExtractor,
+  async (request, response) => {
+    const user = request.user;
+
+    const { comment, ...newBlogData } = request.body;
+
+    const newBlog = {
+      ...newBlogData,
+      comments: [...newBlogData.comments, comment],
+      user: user.id,
+    };
+
+    const blog = await Blog.findByIdAndUpdate(request.params.id, newBlog, {
+      new: true,
+    });
+
+    response.status(201).json(blog);
+  }
+);
+
 module.exports = blogsRouter;
