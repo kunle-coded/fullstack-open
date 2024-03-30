@@ -26,7 +26,7 @@ const Authors = (props) => {
   }, [name, result.data]);
 
   if (result.loading) {
-    return <div>loading...</div>;
+    return <div>Loading...</div>;
   }
 
   function submit(e) {
