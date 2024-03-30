@@ -21,16 +21,6 @@ const App = () => {
     dispatch({ type: 'REMOVE_USER' });
   }
 
-  // if (user === null) {
-  //   return (
-  //     <div>
-  //       <h2>Log in to application</h2>
-  //       <br />
-  //       <LoginForm />
-  //     </div>
-  //   );
-  // }
-
   return (
     <Container>
       <Navigation />
